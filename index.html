@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2em; }
+    label { display: block; margin-top: 1em; }
+    input, select, button { width: 300px; padding: 8px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2>Employee Registration</h2>
+  <form id="employeeForm">
+    <label>Employee Code</label>
+    <input type="text" name="employee_code" required>
+
+    <label>Name</label>
+    <input type="text" name="name" required>
+
+    <label>State</label>
+    <select id="state" required>
+      <option value="">--Select State--</option>
+      <option value="Maharashtra">Maharashtra</option>
+      <option value="Gujarat">Gujarat</option>
+    </select>
+
+    <label>District</label>
+    <select id="district" required>
+      <option value="">--Select District--</option>
+    </select>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    const stateDistrictMap = {
+      "Maharashtra": ["Mumbai", "Pune", "Nagpur"],
+      "Gujarat": ["Ahmedabad", "Surat", "Rajkot"]
+    };
+
+    const stateEl = document.getElementById("state");
+    const districtEl = document.getElementById("district");
+
+    stateEl.addEventListener("change", function () {
+      const districts = stateDistrictMap[this.value] || [];
+      districtEl.innerHTML = '<option value="">--Select District--</option>';
+      districts.forEach(d => {
+        let opt = document.createElement("option");
+        opt.value = d;
+        opt.innerText = d;
+        districtEl.appendChild(opt);
+      });
+    });
+
+    document.getElementById("employeeForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        data: [{
+          Employee_Code: this.employee_code.value,
+          Name: this.name.value,
+          State: this.state.value,
+          District: this.district.value
+        }]
+      };
+
+      fetch("https://sheetdb.io/api/v1/bvjp30ew6l4o8", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(() => {
+        document.getElementById("message").textContent = "✅ Employee added successfully!";
+        this.reset();
+        districtEl.innerHTML = '<option value="">--Select District--</option>';
+      })
+      .catch(() => {
+        document.getElementById("message").textContent = "❌ Submission failed.";
+      });
+    });
+  </script>
+
+</body>
+</html>
